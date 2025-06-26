@@ -42,14 +42,51 @@
       border-radius: 20px;
       border: 1px solid #ddd;
       font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: #2c7a51;
+      box-shadow: 0 0 5px rgba(44, 122, 81, 0.3);
+    }
+    
+    .controls-container {
+      background-color: #e8e8e8;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     
     .filter-container {
       display: flex;
-      padding: 8px 16px;
       gap: 8px;
       overflow-x: auto;
-      background-color: #e8e8e8;
+      flex: 1;
+    }
+    
+    .sort-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .sort-label {
+      font-size: 14px;
+      color: #666;
+      white-space: nowrap;
+    }
+    
+    .sort-select {
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      background-color: white;
+      cursor: pointer;
     }
     
     .filter-btn {
@@ -60,12 +97,25 @@
       font-size: 14px;
       cursor: pointer;
       white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+    
+    .filter-btn:hover {
+      background-color: #f0f0f0;
     }
     
     .filter-btn.active {
       background-color: #2c7a51;
       color: white;
       border-color: #2c7a51;
+    }
+    
+    .results-info {
+      padding: 8px 16px;
+      font-size: 14px;
+      color: #666;
+      background-color: #f9f9f9;
+      border-bottom: 1px solid #eee;
     }
     
     .park-list {
@@ -78,6 +128,16 @@
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .park-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .park-card.hidden {
+      display: none;
     }
     
     .park-header {
@@ -157,10 +217,16 @@
       color: #2c7a51;
     }
     
-    .phone-number {
+    .phone-number, .email-link {
       color: #2c7a51;
       text-decoration: none;
       font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .phone-number:hover, .email-link:hover {
+      color: #1f5a3a;
+      text-decoration: underline;
     }
     
     .permit-item {
@@ -193,6 +259,30 @@
       background-color: #eee;
       margin: 16px 0;
     }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-size: 16px;
+    }
+    
+    .no-results-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    @media (max-width: 768px) {
+      .controls-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .sort-container {
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -201,20 +291,34 @@
   </header>
   
   <div class="search-container">
-    <input type="text" class="search-box" placeholder="Search for a park...">
+    <input type="text" class="search-box" placeholder="Search for a park, region, or contact info..." id="searchInput">
   </div>
   
-  <div class="filter-container">
-    <button class="filter-btn active" data-filter="all">All Parks</button>
-    <button class="filter-btn" data-filter="national">National Parks</button>
-    <button class="filter-btn" data-filter="state">State Parks</button>
-    <button class="filter-btn" data-filter="game">Game Reserves</button>
-    <button class="filter-btn" data-filter="marine">Marine Reserves</button>
+  <div class="controls-container">
+    <div class="filter-container">
+      <button class="filter-btn active" data-filter="all">All Parks</button>
+      <button class="filter-btn" data-filter="national">National Parks</button>
+      <button class="filter-btn" data-filter="state">State Parks</button>
+      <button class="filter-btn" data-filter="game">Game Reserves</button>
+      <button class="filter-btn" data-filter="marine">Marine Reserves</button>
+    </div>
+    <div class="sort-container">
+      <label class="sort-label" for="sortSelect">Sort by:</label>
+      <select id="sortSelect" class="sort-select">
+        <option value="name">Park Name</option>
+        <option value="region">Region</option>
+        <option value="category">Category</option>
+      </select>
+    </div>
   </div>
   
-  <div class="park-list">
+  <div class="results-info" id="resultsInfo">
+    Showing all parks
+  </div>
+  
+  <div class="park-list" id="parkList">
     <!-- Etosha National Park -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Etosha National Park" data-region="Northern Namibia">
       <div class="park-header">
         <div>
           <div class="park-name">Etosha National Park</div>
@@ -235,7 +339,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>reservations@nwr.com.na</span>
+            <a href="mailto:reservations@nwr.com.na" class="email-link">reservations@nwr.com.na</a>
           </div>
         </div>
         
@@ -258,7 +362,7 @@
     </div>
     
     <!-- Namib-Naukluft National Park -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Namib-Naukluft National Park" data-region="Western Namibia">
       <div class="park-header">
         <div>
           <div class="park-name">Namib-Naukluft National Park</div>
@@ -279,7 +383,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>naukluft@nwr.com.na</span>
+            <a href="mailto:naukluft@nwr.com.na" class="email-link">naukluft@nwr.com.na</a>
           </div>
         </div>
         
@@ -302,7 +406,7 @@
     </div>
     
     <!-- Skeleton Coast National Park -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Skeleton Coast National Park" data-region="Northwestern Coast">
       <div class="park-header">
         <div>
           <div class="park-name">Skeleton Coast National Park</div>
@@ -319,7 +423,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>skeleton@met.gov.na</span>
+            <a href="mailto:skeleton@met.gov.na" class="email-link">skeleton@met.gov.na</a>
           </div>
         </div>
         
@@ -342,7 +446,7 @@
     </div>
     
     <!-- Bwabwata National Park -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Bwabwata National Park" data-region="Northeastern Namibia (Caprivi)">
       <div class="park-header">
         <div>
           <div class="park-name">Bwabwata National Park</div>
@@ -382,7 +486,7 @@
     </div>
     
     <!-- Khaudum National Park -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Khaudum National Park" data-region="Northeastern Namibia">
       <div class="park-header">
         <div>
           <div class="park-name">Khaudum National Park</div>
@@ -399,7 +503,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>khaudum@met.gov.na</span>
+            <a href="mailto:khaudum@met.gov.na" class="email-link">khaudum@met.gov.na</a>
           </div>
         </div>
         
@@ -422,7 +526,7 @@
     </div>
     
     <!-- Mudumu National Park -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Mudumu National Park" data-region="Zambezi Region (Caprivi)">
       <div class="park-header">
         <div>
           <div class="park-name">Mudumu National Park</div>
@@ -462,7 +566,7 @@
     </div>
     
     <!-- Nkasa Rupara National Park (formerly Mamili) -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Nkasa Rupara National Park" data-region="Zambezi Region (Caprivi)">
       <div class="park-header">
         <div>
           <div class="park-name">Nkasa Rupara National Park</div>
@@ -501,7 +605,7 @@
     </div>
     
     <!-- Mangetti National Park -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Mangetti National Park" data-region="Northern Namibia">
       <div class="park-header">
         <div>
           <div class="park-name">Mangetti National Park</div>
@@ -536,7 +640,7 @@
     </div>
     
     <!-- Tsau //Khaeb National Park (formerly Sperrgebiet) -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Tsau //Khaeb National Park" data-region="Southern Namibia">
       <div class="park-header">
         <div>
           <div class="park-name">Tsau //Khaeb National Park</div>
@@ -553,7 +657,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>sperrgebiet@met.gov.na</span>
+            <a href="mailto:sperrgebiet@met.gov.na" class="email-link">sperrgebiet@met.gov.na</a>
           </div>
         </div>
         
@@ -571,7 +675,7 @@
     </div>
     
     <!-- Dorob National Park -->
-    <div class="park-card" data-category="national">
+    <div class="park-card" data-category="national" data-name="Dorob National Park" data-region="Western Namibia">
       <div class="park-header">
         <div>
           <div class="park-name">Dorob National Park</div>
@@ -588,7 +692,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>dorob@met.gov.na</span>
+            <a href="mailto:dorob@met.gov.na" class="email-link">dorob@met.gov.na</a>
           </div>
         </div>
         
@@ -611,7 +715,7 @@
     </div>
     
     <!-- Daan Viljoen Game Park -->
-    <div class="park-card" data-category="game">
+    <div class="park-card" data-category="game" data-name="Daan Viljoen Game Park" data-region="Khomas Region, near Windhoek">
       <div class="park-header">
         <div>
           <div class="park-name">Daan Viljoen Game Park</div>
@@ -628,7 +732,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>daanviljoen@nwr.com.na</span>
+            <a href="mailto:daanviljoen@nwr.com.na" class="email-link">daanviljoen@nwr.com.na</a>
           </div>
         </div>
         
@@ -646,7 +750,7 @@
     </div>
     
     <!-- Gross Barmen -->
-    <div class="park-card" data-category="state">
+    <div class="park-card" data-category="state" data-name="Gross Barmen" data-region="Otjozondjupa Region">
       <div class="park-header">
         <div>
           <div class="park-name">Gross Barmen</div>
@@ -663,7 +767,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>grossbarmen@nwr.com.na</span>
+            <a href="mailto:grossbarmen@nwr.com.na" class="email-link">grossbarmen@nwr.com.na</a>
           </div>
         </div>
         
@@ -685,7 +789,7 @@
     </div>
     
     <!-- Cape Cross Seal Reserve -->
-    <div class="park-card" data-category="state">
+    <div class="park-card" data-category="state" data-name="Cape Cross Seal Reserve" data-region="Erongo Region">
       <div class="park-header">
         <div>
           <div class="park-name">Cape Cross Seal Reserve</div>
@@ -720,7 +824,7 @@
     </div>
     
     <!-- Von Bach Recreation Resort -->
-    <div class="park-card" data-category="state">
+    <div class="park-card" data-category="state" data-name="Von Bach Recreation Resort" data-region="Otjozondjupa Region">
       <div class="park-header">
         <div>
           <div class="park-name">Von Bach Recreation Resort</div>
@@ -737,7 +841,7 @@
           </div>
           <div class="contact-item">
             <div class="icon">✉️</div>
-            <span>vonbach@nwr.com.na</span>
+            <a href="mailto:vonbach@nwr.com.na" class="email-link">vonbach@nwr.com.na</a>
           </div>
         </div>
         
@@ -760,7 +864,7 @@
     </div>
     
     <!-- Hardap Recreation Resort -->
-    <div class="park-card" data-category="state">
+    <div class="park-card" data-category="state" data-name="Hardap Recreation Resort" data-region="Hardap Region">
       <div class="park-header">
         <div>
           <div class="park-name">Hardap Recreation Resort</div>
@@ -775,4 +879,199 @@
             <div class="icon">📞</div>
             <a href="tel:+264632405071" class="phone-number">+264 63 240 5071</a>
           </div>
-          <div class="
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <a href="mailto:hardap@nwr.com.na" class="email-link">hardap@nwr.com.na</a>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Day Visitor Entry</div>
+            <div class="permit-info">Available at entrance</div>
+            <div class="permit-info">N$50 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Fishing Permit</div>
+            <div class="permit-info">Available at resort office</div>
+            <div class="permit-info">N$70 per person/day</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="no-results" id="noResults" style="display: none;">
+    <div class="no-results-icon">🔍</div>
+    <div>No parks found matching your search criteria.</div>
+    <div style="margin-top: 8px; font-size: 14px;">Try adjusting your search terms or filters.</div>
+  </div>
+  
+  <footer>
+    <p>Namibia Parks Directory • Contact information and permits current as of 2024</p>
+    <p>Always verify current requirements before visiting</p>
+  </footer>
+
+  <script>
+    // Get DOM elements
+    const searchInput = document.getElementById('searchInput');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const sortSelect = document.getElementById('sortSelect');
+    const parkCards = document.querySelectorAll('.park-card');
+    const resultsInfo = document.getElementById('resultsInfo');
+    const noResults = document.getElementById('noResults');
+    const parkList = document.getElementById('parkList');
+
+    let currentFilter = 'all';
+    let currentSort = 'name';
+
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+      filterAndSort();
+    });
+
+    // Filter functionality
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        currentFilter = this.getAttribute('data-filter');
+        filterAndSort();
+      });
+    });
+
+    // Sort functionality
+    sortSelect.addEventListener('change', function() {
+      currentSort = this.value;
+      filterAndSort();
+    });
+
+    function filterAndSort() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      let visibleCards = [];
+
+      // Filter and search
+      parkCards.forEach(card => {
+        const category = card.getAttribute('data-category');
+        const name = card.getAttribute('data-name').toLowerCase();
+        const region = card.getAttribute('data-region').toLowerCase();
+        const content = card.textContent.toLowerCase();
+
+        // Check if card matches filter
+        const matchesFilter = currentFilter === 'all' || category === currentFilter;
+        
+        // Check if card matches search
+        const matchesSearch = searchTerm === '' || 
+          name.includes(searchTerm) || 
+          region.includes(searchTerm) || 
+          content.includes(searchTerm);
+
+        if (matchesFilter && matchesSearch) {
+          card.classList.remove('hidden');
+          visibleCards.push(card);
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      // Sort visible cards
+      sortCards(visibleCards);
+
+      // Update results info
+      updateResultsInfo(visibleCards.length, searchTerm);
+
+      // Show/hide no results message
+      if (visibleCards.length === 0) {
+        noResults.style.display = 'block';
+        parkList.style.display = 'none';
+      } else {
+        noResults.style.display = 'none';
+        parkList.style.display = 'block';
+      }
+    }
+
+    function sortCards(cards) {
+      // Convert NodeList to Array and sort
+      const sortedCards = Array.from(cards).sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (currentSort) {
+          case 'name':
+            aValue = a.getAttribute('data-name');
+            bValue = b.getAttribute('data-name');
+            break;
+          case 'region':
+            aValue = a.getAttribute('data-region');
+            bValue = b.getAttribute('data-region');
+            break;
+          case 'category':
+            aValue = a.getAttribute('data-category');
+            bValue = b.getAttribute('data-category');
+            break;
+          default:
+            aValue = a.getAttribute('data-name');
+            bValue = b.getAttribute('data-name');
+        }
+        
+        return aValue.localeCompare(bValue);
+      });
+
+      // Reorder cards in DOM
+      sortedCards.forEach(card => {
+        parkList.appendChild(card);
+      });
+    }
+
+    function updateResultsInfo(count, searchTerm) {
+      let message = '';
+      
+      if (searchTerm && currentFilter !== 'all') {
+        const filterName = getFilterDisplayName(currentFilter);
+        message = `Showing ${count} ${filterName.toLowerCase()} matching "${searchTerm}"`;
+      } else if (searchTerm) {
+        message = `Showing ${count} parks matching "${searchTerm}"`;
+      } else if (currentFilter !== 'all') {
+        const filterName = getFilterDisplayName(currentFilter);
+        message = `Showing ${count} ${filterName.toLowerCase()}`;
+      } else {
+        message = `Showing all ${count} parks`;
+      }
+      
+      // Add sort info
+      const sortName = getSortDisplayName(currentSort);
+      message += ` • Sorted by ${sortName}`;
+      
+      resultsInfo.textContent = message;
+    }
+
+    function getFilterDisplayName(filter) {
+      const filterNames = {
+        'all': 'Parks',
+        'national': 'National Parks',
+        'state': 'State Parks', 
+        'game': 'Game Reserves',
+        'marine': 'Marine Reserves'
+      };
+      return filterNames[filter] || 'Parks';
+    }
+
+    function getSortDisplayName(sort) {
+      const sortNames = {
+        'name': 'park name',
+        'region': 'region',
+        'category': 'category'
+      };
+      return sortNames[sort] || 'park name';
+    }
+
+    // Initialize the display
+    filterAndSort();
+  </script>
+</body>
+</html>
