@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Namibia National Parks</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    header {
+      background-color: #2c7a51;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .search-container {
+      background-color: #f0f0f0;
+      padding: 12px 16px;
+      position: sticky;
+      top: 60px;
+      z-index: 5;
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+    }
+    
+    .filter-container {
+      display: flex;
+      padding: 8px 16px;
+      gap: 8px;
+      overflow-x: auto;
+      background-color: #e8e8e8;
+    }
+    
+    .filter-btn {
+      padding: 6px 12px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    
+    .filter-btn.active {
+      background-color: #2c7a51;
+      color: white;
+      border-color: #2c7a51;
+    }
+    
+    .park-list {
+      padding: 8px 0;
+    }
+    
+    .park-card {
+      background-color: white;
+      margin: 12px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .park-header {
+      background-color: #f8f8f8;
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .park-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c7a51;
+    }
+    
+    .park-region {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .park-badge {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+      margin-top: 4px;
+      display: inline-block;
+    }
+    
+    .national {
+      background-color: #e3f2fd;
+      color: #0d47a1;
+    }
+    
+    .state {
+      background-color: #e8f5e9;
+      color: #1b5e20;
+    }
+    
+    .game {
+      background-color: #fff3e0;
+      color: #e65100;
+    }
+    
+    .marine {
+      background-color: #e0f7fa;
+      color: #006064;
+    }
+    
+    .park-content {
+      padding: 16px;
+    }
+    
+    .contact-section h3, .permit-section h3 {
+      margin-bottom: 8px;
+      color: #555;
+      font-size: 16px;
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #eaf4ef;
+      border-radius: 50%;
+      color: #2c7a51;
+    }
+    
+    .phone-number {
+      color: #2c7a51;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .permit-item {
+      background-color: #f8f8f8;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    
+    .permit-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .permit-info {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #f0f0f0;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .section-divider {
+      height: 1px;
+      background-color: #eee;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Namibia Parks Directory</h1>
+  </header>
+  
+  <div class="search-container">
+    <input type="text" class="search-box" placeholder="Search for a park...">
+  </div>
+  
+  <div class="filter-container">
+    <button class="filter-btn active" data-filter="all">All Parks</button>
+    <button class="filter-btn" data-filter="national">National Parks</button>
+    <button class="filter-btn" data-filter="state">State Parks</button>
+    <button class="filter-btn" data-filter="game">Game Reserves</button>
+    <button class="filter-btn" data-filter="marine">Marine Reserves</button>
+  </div>
+  
+  <div class="park-list">
+    <!-- Etosha National Park -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Etosha National Park</div>
+          <div class="park-region">Northern Namibia</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264612914002" class="phone-number">+264 61 291 4002</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264612914003" class="phone-number">+264 61 291 4003</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>reservations@nwr.com.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at park entrance gates and NWR offices in Windhoek</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Vehicle Permit</div>
+            <div class="permit-info">Available at park entrance gates</div>
+            <div class="permit-info">N$10 per vehicle/day</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Namib-Naukluft National Park -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Namib-Naukluft National Park</div>
+          <div class="park-region">Western Namibia</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264625772004" class="phone-number">+264 62 577 2004</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264625772005" class="phone-number">+264 62 577 2005</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>naukluft@nwr.com.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at Sesriem gate and MET offices</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Sossusvlei Shuttle Permit</div>
+            <div class="permit-info">Available at Sesriem (for the last 5km to Sossusvlei)</div>
+            <div class="permit-info">N$170 per person</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Skeleton Coast National Park -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Skeleton Coast National Park</div>
+          <div class="park-region">Northwestern Coast</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264644561148" class="phone-number">+264 64 456 1148</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>skeleton@met.gov.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Southern Section Entry Permit</div>
+            <div class="permit-info">Available at entrance gates (Ugabmund & Springbokwasser)</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Northern Section Concession</div>
+            <div class="permit-info">Only through approved tour operators</div>
+            <div class="permit-info">Prices vary by operator</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bwabwata National Park -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Bwabwata National Park</div>
+          <div class="park-region">Northeastern Namibia (Caprivi)</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264668110118" class="phone-number">+264 66 811 0118</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264612842520" class="phone-number">+264 61 284 2520</a> (MET Office)
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at MET offices and entrance gates</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Special Activity Permit</div>
+            <div class="permit-info">For camping in non-designated areas</div>
+            <div class="permit-info">Apply at MET Headquarters, Windhoek</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Khaudum National Park -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Khaudum National Park</div>
+          <div class="park-region">Northeastern Namibia</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264672325343" class="phone-number">+264 67 232 5343</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>khaudum@met.gov.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at MET offices and entrance gates</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">4x4 Vehicle Requirement</div>
+            <div class="permit-info">Mandatory due to sandy terrain</div>
+            <div class="permit-info">Minimum two vehicles recommended</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mudumu National Park -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Mudumu National Park</div>
+          <div class="park-region">Zambezi Region (Caprivi)</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264662522518" class="phone-number">+264 66 252 2518</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264612842530" class="phone-number">+264 61 284 2530</a> (MET Office)
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at MET offices and entrance gates</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Camping Permit</div>
+            <div class="permit-info">Available at park office</div>
+            <div class="permit-info">N$120 per person/night</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Nkasa Rupara National Park (formerly Mamili) -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Nkasa Rupara National Park</div>
+          <div class="park-region">Zambezi Region (Caprivi)</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264662587643" class="phone-number">+264 66 258 7643</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264612842533" class="phone-number">+264 61 284 2533</a> (MET Office)
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at MET offices and entrance gates</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">4x4 Vehicle Requirement</div>
+            <div class="permit-info">Mandatory especially in rainy season</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mangetti National Park -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Mangetti National Park</div>
+          <div class="park-region">Northern Namibia</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264672290461" class="phone-number">+264 67 229 0461</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264612842580" class="phone-number">+264 61 284 2580</a> (MET Office)
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at MET offices</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tsau //Khaeb National Park (formerly Sperrgebiet) -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Tsau //Khaeb National Park</div>
+          <div class="park-region">Southern Namibia</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264632022600" class="phone-number">+264 63 202 2600</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>sperrgebiet@met.gov.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Special Access Permit</div>
+            <div class="permit-info">Available only through approved tour operators</div>
+            <div class="permit-info">Most areas restricted - advance booking essential</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Dorob National Park -->
+    <div class="park-card" data-category="national">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Dorob National Park</div>
+          <div class="park-region">Western Namibia</div>
+          <div class="park-badge national">National Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264644104600" class="phone-number">+264 64 410 4600</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>dorob@met.gov.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at MET offices in Swakopmund and Walvis Bay</div>
+            <div class="permit-info">N$80 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Off-Road Vehicle Permit</div>
+            <div class="permit-info">Required for designated 4x4 areas</div>
+            <div class="permit-info">N$50 per vehicle/day</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Daan Viljoen Game Park -->
+    <div class="park-card" data-category="game">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Daan Viljoen Game Park</div>
+          <div class="park-region">Khomas Region, near Windhoek</div>
+          <div class="park-badge game">Game Reserve</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264612891800" class="phone-number">+264 61 289 1800</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>daanviljoen@nwr.com.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Park Entry Permit</div>
+            <div class="permit-info">Available at park entrance</div>
+            <div class="permit-info">N$40 per person/day (Foreigners)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Gross Barmen -->
+    <div class="park-card" data-category="state">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Gross Barmen</div>
+          <div class="park-region">Otjozondjupa Region</div>
+          <div class="park-badge state">State Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264672933270" class="phone-number">+264 67 293 3270</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>grossbarmen@nwr.com.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Day Visitor Entry</div>
+            <div class="permit-info">Available at entrance</div>
+            <div class="permit-info">N$50 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Hot Springs Access</div>
+            <div class="permit-info">Included with entry</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Cape Cross Seal Reserve -->
+    <div class="park-card" data-category="state">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Cape Cross Seal Reserve</div>
+          <div class="park-region">Erongo Region</div>
+          <div class="park-badge state">State Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264644001469" class="phone-number">+264 64 400 1469</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264612842525" class="phone-number">+264 61 284 2525</a> (MET Office)
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Reserve Entry Permit</div>
+            <div class="permit-info">Available at entrance gate</div>
+            <div class="permit-info">N$60 per person/day (Foreigners)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Von Bach Recreation Resort -->
+    <div class="park-card" data-category="state">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Von Bach Recreation Resort</div>
+          <div class="park-region">Otjozondjupa Region</div>
+          <div class="park-badge state">State Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264622512628" class="phone-number">+264 62 251 2628</a>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <span>vonbach@nwr.com.na</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="permit-section">
+          <h3>Required Permits</h3>
+          <div class="permit-item">
+            <div class="permit-name">Day Visitor Entry</div>
+            <div class="permit-info">Available at entrance</div>
+            <div class="permit-info">N$50 per person/day (Foreigners)</div>
+          </div>
+          <div class="permit-item">
+            <div class="permit-name">Fishing Permit</div>
+            <div class="permit-info">Available at resort office</div>
+            <div class="permit-info">N$70 per person/day</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Hardap Recreation Resort -->
+    <div class="park-card" data-category="state">
+      <div class="park-header">
+        <div>
+          <div class="park-name">Hardap Recreation Resort</div>
+          <div class="park-region">Hardap Region</div>
+          <div class="park-badge state">State Park</div>
+        </div>
+      </div>
+      <div class="park-content">
+        <div class="contact-section">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <a href="tel:+264632405071" class="phone-number">+264 63 240 5071</a>
+          </div>
+          <div class="
